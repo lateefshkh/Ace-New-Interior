@@ -1,5 +1,4 @@
-@import "tailwindcss" source(none);
-@source "../src";
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -204,6 +203,10 @@
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+[data-parallax] {
+  will-change: transform;
 }
 
 .stagger-1 {
