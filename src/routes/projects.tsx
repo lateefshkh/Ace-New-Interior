@@ -115,7 +115,7 @@ function ProjectsPage() {
                   src={project.image}
                   alt={project.alt}
                   data-parallax="14"
-                  className="absolute inset-0 h-[120%] w-full object-cover"
+                  className="absolute -top-[10%] left-0 h-[120%] w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-primary/0 transition-colors duration-500 group-hover:bg-primary/10" />
               </div>

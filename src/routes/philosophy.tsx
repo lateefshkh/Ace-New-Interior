@@ -89,7 +89,7 @@ function PhilosophyPage() {
               src={MATERIAL_IMG}
               alt="Macro shot of rough travertine stone meeting a matte bronze column"
               data-parallax="12"
-              className="absolute inset-0 h-[120%] w-full object-cover"
+              className="absolute -top-[10%] left-0 h-[120%] w-full object-cover"
             />
           </div>
         </section>

@@ -140,7 +140,7 @@ function ProcessPage() {
                   src={step.image}
                   alt={step.alt}
                   data-parallax="12"
-                  className={`absolute inset-0 h-[120%] w-full object-cover ${step.imageClass}`}
+                  className={`absolute -top-[10%] left-0 h-[120%] w-full object-cover ${step.imageClass}`}
                 />
                 {step.inset ? (
                   <div

@@ -62,7 +62,7 @@ function Index() {
             src={HERO_IMG}
             alt="Minimalist living space with a monolithic concrete wall, warm wood flooring and a sculptural lounge chair"
             data-parallax="10"
-            className="absolute inset-0 h-[120%] w-full object-cover"
+            className="absolute -top-[10%] left-0 h-[120%] w-full object-cover"
           />
           <div className="absolute inset-0 bg-background/20 mix-blend-overlay" />
         </div>
@@ -116,7 +116,7 @@ function Index() {
                   src={KITCHEN_IMG}
                   alt="Minimalist kitchen with a monolithic marble island and matte black cabinetry"
                   data-parallax="15"
-                  className="absolute inset-0 h-[120%] w-full object-cover object-center"
+                  className="absolute -top-[10%] left-0 h-[120%] w-full object-cover object-center"
                 />
               </div>
               <div className="relative z-10 max-w-md border-architectural bg-surface/90 p-8 backdrop-blur-sm">
@@ -135,7 +135,7 @@ function Index() {
                   src={STUDIO_IMG}
                   alt="Studio space with raw concrete pillars, gallery walls and a sculptural bronze desk"
                   data-parallax="15"
-                  className="absolute inset-0 h-[120%] w-full object-cover object-center"
+                  className="absolute -top-[10%] left-0 h-[120%] w-full object-cover object-center"
                 />
               </div>
               <div className="relative z-10 ml-auto mt-20 max-w-md border-architectural bg-surface/90 p-8 backdrop-blur-sm md:ml-0 md:-translate-x-1/2">
