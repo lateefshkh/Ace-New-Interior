@@ -48,7 +48,7 @@ export function useParallax() {
         if (!container) return;
         const rect = container.getBoundingClientRect();
         if (rect.bottom < -viewport || rect.top > viewport * 2) return;
-        const strength = Number(el.dataset.parallax) || 12;
+        const strength = Number(el.dataset["parallax"]) || 12;
         const progress = (viewport - rect.top) / (viewport + rect.height);
         el.style.transform = `translate3d(0, ${((progress - 0.5) * -strength).toFixed(2)}%, 0)`;
       });
