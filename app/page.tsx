@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { useParallax, useScrollReveal } from "@/hooks/use-motion";
+import { useState } from "react";
 
 // ============================================================================
 // PASTE YOUR OWN IMAGE URLS HERE
@@ -58,6 +59,51 @@ const testimonials = [
 export default function HomePage() {
   useScrollReveal();
   useParallax();
+
+  // ============================================================
+  // INQUIRY FORM STATE
+  // ============================================================
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatus('idle');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', phone: '', message: '' });
+        // Auto-hide success after 5 seconds
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        setStatus('error');
+        setErrorMessage(data.error || 'Failed to submit inquiry');
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -271,10 +317,7 @@ export default function HomePage() {
         </section>
 
         {/* Inquiry Form Section */}
-        <section
-          className="border-t border-primary/10 bg-background px-margin-mobile py-32 md:px-margin-desktop"
-          id="inquiry"
-        >
+        <section className="border-t border-primary/10 bg-background px-margin-mobile py-32 md:px-margin-desktop" id="inquiry">
           <div className="mx-auto grid max-w-container-max grid-cols-1 gap-gutter md:grid-cols-2">
             <div>
               <h2 className="mb-6 font-display-lg text-headline-lg-mobile text-primary md:text-display-lg">
@@ -283,60 +326,86 @@ export default function HomePage() {
                 Conversation.
               </h2>
               <p className="mb-12 max-w-sm font-body-md text-body-md text-on-surface-variant">
-                We accept a limited number of commissions each year to ensure uncompromising
-                quality.
+                We accept a limited number of commissions each year to ensure uncompromising quality.
               </p>
             </div>
 
             <div className="border-architectural bg-surface p-8">
-              <form className="space-y-8" onSubmit={(event) => event.preventDefault()}>
+              <form className="space-y-8" onSubmit={handleInquirySubmit}>
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary"
-                  >
-                    Name
+                  <label htmlFor="name" className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary">
+                    Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="name"
                     type="text"
                     placeholder="Jane Doe"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full border-0 border-b border-primary/20 bg-transparent px-0 py-2 font-body-md text-primary transition-colors outline-none placeholder:text-on-surface-variant/50 focus:border-primary"
+                    required
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary"
-                  >
-                    Email
+                  <label htmlFor="email" className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary">
+                    Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="email"
                     type="email"
                     placeholder="jane@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full border-0 border-b border-primary/20 bg-transparent px-0 py-2 font-body-md text-primary transition-colors outline-none placeholder:text-on-surface-variant/50 focus:border-primary"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary">
+                    Phone Number
+                  </label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full border-0 border-b border-primary/20 bg-transparent px-0 py-2 font-body-md text-primary transition-colors outline-none placeholder:text-on-surface-variant/50 focus:border-primary"
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="project"
-                    className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary"
-                  >
-                    Project Details
+                  <label htmlFor="project" className="mb-2 block font-label-sm text-label-sm uppercase tracking-widest text-primary">
+                    Project Details <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="project"
                     rows={3}
                     placeholder="Briefly describe your vision..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full resize-none border-0 border-b border-primary/20 bg-transparent px-0 py-2 font-body-md text-primary transition-colors outline-none placeholder:text-on-surface-variant/50 focus:border-primary"
+                    required
                   />
                 </div>
+
+                {/* Status Messages */}
+                {status === 'success' && (
+                  <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-lg text-sm">
+                    ✅ Thank you! We'll get back to you shortly.
+                  </div>
+                )}
+                {status === 'error' && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg text-sm">
+                    ❌ {errorMessage || 'Something went wrong. Please try again.'}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="mt-8 w-full bg-primary py-4 font-label-sm text-label-sm uppercase tracking-widest text-on-primary transition-colors duration-300 hover:bg-secondary"
+                  disabled={isLoading}
+                  className="mt-8 w-full bg-primary py-4 font-label-sm text-label-sm uppercase tracking-widest text-on-primary transition-colors duration-300 hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Inquiry
+                  {isLoading ? 'Sending...' : 'Submit Inquiry'}
                 </button>
               </form>
             </div>

@@ -10,6 +10,9 @@ const links = [
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
   { href: "/process", label: "Process" },
+  { href: "/dashboard", label: "Dashboard" },
+    { href: "/admin/properties", label: "Properties" },
+
 ] as const;
 
 export function SiteNav() {
