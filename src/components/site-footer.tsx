@@ -20,10 +20,10 @@ export function SiteFooter() {
 
         <nav className="flex flex-wrap gap-6 md:flex-col md:items-end md:gap-4">
           <Link
-            href="/projects"
+            href="/properties"
             className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
           >
-            Projects
+            Properties
           </Link>
           <Link
             href="/philosophy"

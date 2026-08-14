@@ -5,14 +5,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
-  { href: "/projects", label: "Projects" },
+  { href: "/properties", label: "Properties" },
   { href: "/philosophy", label: "Philosophy" },
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
   { href: "/process", label: "Process" },
-  { href: "/dashboard", label: "Dashboard" },
-    { href: "/admin/properties", label: "Properties" },
-
+  { href: "/account", label: "Account" },
 ] as const;
 
 export function SiteNav() {
