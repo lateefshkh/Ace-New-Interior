@@ -486,7 +486,7 @@ export default function AdminPropertiesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 font-medium">{property.title}</td>
-                      <td className="px-6 py-4">₹{(property.price / 100000).toFixed(1)}L</td>
+                      <td className="px-6 py-4 font-medium">Rs. {property.price ? property.price.toLocaleString("en-IN") : 0}</td>
                       <td className="px-6 py-4 text-sm">{property.location}</td>
                       <td className="px-6 py-4">{property.bedrooms}BHK</td>
                       <td className="px-6 py-4">

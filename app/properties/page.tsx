@@ -15,9 +15,9 @@ import {
   SlidersHorizontal,
   X, 
   ArrowRight,
-  Sparkles,
   PhoneCall,
-  CheckCircle2
+  CheckCircle2,
+  Search
 } from "lucide-react";
 
 interface Property {
@@ -43,7 +43,7 @@ const MOCK_PROPERTIES: Property[] = [
     $id: "mock-1",
     title: "The Kyoto Sanctuary",
     description: "An architectural marvel combining traditional minimalist wooden aesthetics with contemporary floor-to-ceiling glass paneling and private Zen courtyards.",
-    price: 4500000,
+    price: 45000000,
     location: "Arashiyama District",
     city: "Kyoto",
     state: "Kansai",
@@ -58,7 +58,7 @@ const MOCK_PROPERTIES: Property[] = [
     $id: "mock-2",
     title: "Atelier O Living Residence",
     description: "A refined urban living space boasting monolith marble kitchen islands, natural teak accents, and custom ambient acoustic ceiling systems.",
-    price: 2850000,
+    price: 28500000,
     location: "Mayfair",
     city: "London",
     state: "Greater London",
@@ -73,7 +73,7 @@ const MOCK_PROPERTIES: Property[] = [
     $id: "mock-3",
     title: "Luminescence Loft",
     description: "Expansive light-filled gallery residence featuring polished micro-cement floors, skylights with solar tracking, and bespoke minimalist joinery.",
-    price: 1950000,
+    price: 19500000,
     location: "Tribeca",
     city: "New York",
     state: "NY",
@@ -88,7 +88,7 @@ const MOCK_PROPERTIES: Property[] = [
     $id: "mock-4",
     title: "The Framework HQ & Suites",
     description: "State-of-the-art multi-level studio workspace featuring industrial glass partitions, internal green gardens, and subterranean parking facilities.",
-    price: 6200000,
+    price: 62000000,
     location: "Zurich Nord",
     city: "Zurich",
     state: "Zurich",
@@ -103,7 +103,7 @@ const MOCK_PROPERTIES: Property[] = [
     $id: "mock-5",
     title: "Minimalist Horizon Estate",
     description: "Overlooking coastal cliffs, this organic architectural villa incorporates raw stone walls, infinity water channels, and integrated smart solar climate control.",
-    price: 5400000,
+    price: 54000000,
     location: "Montecito",
     city: "California",
     state: "CA",
@@ -128,6 +128,7 @@ export default function PropertiesShowcasePage() {
   const [selectedBedrooms, setSelectedBedrooms] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
   // Selected property for Modal details
   const [activeProperty, setActiveProperty] = useState<Property | null>(null);
@@ -144,7 +145,6 @@ export default function PropertiesShowcasePage() {
       if (data.success && Array.isArray(data.properties) && data.properties.length > 0) {
         setProperties(data.properties);
       } else {
-        // Fallback to sample architectural properties if Appwrite collection is empty
         setProperties(MOCK_PROPERTIES);
       }
     } catch (err) {
@@ -155,25 +155,31 @@ export default function PropertiesShowcasePage() {
     }
   };
 
+  // Active filter count calculation
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (selectedType !== "all") count++;
+    if (selectedBedrooms !== "all") count++;
+    if (selectedStatus !== "all") count++;
+    if (searchQuery.trim() !== "") count++;
+    return count;
+  }, [selectedType, selectedBedrooms, selectedStatus, searchQuery]);
+
   // Filter Logic
   const filteredProperties = useMemo(() => {
     return properties.filter((p) => {
-      // Type Filter
       if (selectedType !== "all" && p.property_type?.toLowerCase() !== selectedType.toLowerCase()) {
         return false;
       }
-      // Bedrooms Filter
       if (selectedBedrooms !== "all") {
         const beds = parseInt(selectedBedrooms);
         if (selectedBedrooms === "4+" ? p.bedrooms < 4 : p.bedrooms !== beds) {
           return false;
         }
       }
-      // Status Filter
       if (selectedStatus !== "all" && p.status?.toLowerCase() !== selectedStatus.toLowerCase()) {
         return false;
       }
-      // Search Filter
       if (searchQuery.trim() !== "") {
         const q = searchQuery.toLowerCase();
         const matchesTitle = p.title?.toLowerCase().includes(q);
@@ -186,142 +192,80 @@ export default function PropertiesShowcasePage() {
 
   const formatCurrency = (val: number) => {
     if (!val) return "Contact for Price";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 0,
-    }).format(val);
+    return `Rs. ${val.toLocaleString("en-IN")}`;
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-primary">
       <SiteNav />
 
-      {/* Hero Header */}
-      <section className="relative pt-36 pb-20 border-b border-primary/10 bg-surface">
+      {/* Main Content Area starting higher up */}
+      <main className="flex-grow pt-28 pb-16">
         <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 text-label-sm font-label-sm uppercase tracking-widest bg-primary/5 text-secondary border border-secondary/20">
-                <Sparkles className="w-3.5 h-3.5" /> Curated Real Estate Collection
-              </span>
-              <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-primary tracking-tight">
-                Architectural Properties
-              </h1>
-              <p className="mt-4 font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-                Explore our handpicked portfolio of minimalist residences, luxury penthouses, and sanctuary spaces crafted for architectural clarity and spatial elegance.
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin/properties"
-                className="hidden sm:inline-flex items-center gap-2 px-6 py-3.5 border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary transition-all duration-300 font-label-sm text-label-sm uppercase tracking-widest"
-              >
-                Manage Properties
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+          
+          {/* Header Row with Title and Filter Button */}
+          <div className="flex items-center justify-between gap-4 mb-8 border-b border-primary/10 pb-6">
+            <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-primary tracking-tight">
+              Properties
+            </h1>
 
-      {/* Main Content Area */}
-      <main className="flex-grow py-16">
-        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          {/* Controls & Filter Bar */}
-          <div className="mb-12 border border-primary/10 bg-surface p-6 md:p-8 backdrop-blur-md">
-            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-center justify-between">
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="relative inline-flex items-center gap-2 px-6 py-3.5 border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary transition-all duration-300 font-label-sm text-xs uppercase tracking-widest cursor-pointer shadow-sm"
+            >
+              <Filter className="w-4 h-4 text-secondary" />
+              <span>Filter</span>
+              {activeFiltersCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-bold text-xs flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Active Filter Chips Bar (if filters applied) */}
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap items-center gap-3 mb-8 bg-surface p-4 border border-primary/10">
+              <span className="text-xs font-label-sm uppercase tracking-widest text-primary/60 mr-2">Active Filters:</span>
               
-              {/* Search Bar */}
-              <div className="relative flex-grow max-w-md">
-                <input
-                  type="text"
-                  placeholder="Search by title, city, location..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-background border border-primary/15 px-4 py-3 pl-10 text-body-md font-body-md placeholder:text-primary/40 focus:outline-none focus:border-secondary transition-colors"
-                />
-                <MapPin className="absolute left-3 top-3.5 w-4 h-4 text-primary/40" />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-3.5 text-primary/40 hover:text-primary"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 text-primary border border-primary/15 text-xs font-label-sm">
+                  Search: "{searchQuery}"
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-secondary" onClick={() => setSearchQuery("")} />
+                </span>
+              )}
+              {selectedType !== "all" && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 text-primary border border-primary/15 text-xs font-label-sm">
+                  Type: {selectedType}
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-secondary" onClick={() => setSelectedType("all")} />
+                </span>
+              )}
+              {selectedBedrooms !== "all" && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 text-primary border border-primary/15 text-xs font-label-sm">
+                  Beds: {selectedBedrooms}
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-secondary" onClick={() => setSelectedBedrooms("all")} />
+                </span>
+              )}
+              {selectedStatus !== "all" && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/5 text-primary border border-primary/15 text-xs font-label-sm">
+                  Status: {selectedStatus}
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-secondary" onClick={() => setSelectedStatus("all")} />
+                </span>
+              )}
 
-              {/* Filters Group */}
-              <div className="flex flex-wrap items-center gap-4">
-                {/* Property Type Dropdown */}
-                <div className="flex items-center gap-2 border border-primary/15 bg-background px-3 py-2">
-                  <Building2 className="w-4 h-4 text-secondary" />
-                  <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="bg-transparent text-body-md font-body-md text-primary focus:outline-none cursor-pointer pr-2"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="Apartment">Apartment</option>
-                    <option value="Villa">Villa</option>
-                    <option value="Penthouse">Penthouse</option>
-                    <option value="Commercial">Commercial</option>
-                  </select>
-                </div>
-
-                {/* Bedrooms Filter */}
-                <div className="flex items-center gap-2 border border-primary/15 bg-background px-3 py-2">
-                  <BedDouble className="w-4 h-4 text-secondary" />
-                  <select
-                    value={selectedBedrooms}
-                    onChange={(e) => setSelectedBedrooms(e.target.value)}
-                    className="bg-transparent text-body-md font-body-md text-primary focus:outline-none cursor-pointer pr-2"
-                  >
-                    <option value="all">Any Bedrooms</option>
-                    <option value="2">2 Bedrooms</option>
-                    <option value="3">3 Bedrooms</option>
-                    <option value="4">4 Bedrooms</option>
-                    <option value="4+">4+ Bedrooms</option>
-                  </select>
-                </div>
-
-                {/* Status Filter */}
-                <div className="flex items-center gap-2 border border-primary/15 bg-background px-3 py-2">
-                  <SlidersHorizontal className="w-4 h-4 text-secondary" />
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="bg-transparent text-body-md font-body-md text-primary focus:outline-none cursor-pointer pr-2"
-                  >
-                    <option value="all">All Statuses</option>
-                    <option value="available">Available</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="sold">Sold</option>
-                  </select>
-                </div>
-
-                {/* Clear Filters Button */}
-                {(selectedType !== "all" || selectedBedrooms !== "all" || selectedStatus !== "all" || searchQuery) && (
-                  <button
-                    onClick={() => {
-                      setSelectedType("all");
-                      setSelectedBedrooms("all");
-                      setSelectedStatus("all");
-                      setSearchQuery("");
-                    }}
-                    className="text-label-sm font-label-sm uppercase tracking-widest text-secondary hover:underline px-2"
-                  >
-                    Reset Filters
-                  </button>
-                )}
-              </div>
+              <button
+                onClick={() => {
+                  setSelectedType("all");
+                  setSelectedBedrooms("all");
+                  setSelectedStatus("all");
+                  setSearchQuery("");
+                }}
+                className="text-xs font-label-sm uppercase tracking-widest text-secondary hover:underline ml-auto"
+              >
+                Clear All
+              </button>
             </div>
-          </div>
-
-          {/* Results Summary */}
-          <div className="mb-8 flex justify-between items-center text-body-md font-body-md text-on-surface-variant">
-            <p>Showing <span className="font-bold text-primary">{filteredProperties.length}</span> property architectural spaces</p>
-          </div>
+          )}
 
           {/* Loading Grid Skeleton */}
           {loading ? (
@@ -336,7 +280,7 @@ export default function PropertiesShowcasePage() {
               <Building2 className="w-12 h-12 text-primary/30 mx-auto mb-4" />
               <h3 className="font-headline-md text-headline-md text-primary mb-2">No matching properties found</h3>
               <p className="text-on-surface-variant max-w-md mx-auto mb-6">
-                Try adjusting your search criteria or resetting filters to view all available architectural properties.
+                Try adjusting your search criteria or clearing filters to view available properties.
               </p>
               <button
                 onClick={() => {
@@ -450,7 +394,120 @@ export default function PropertiesShowcasePage() {
         </div>
       </main>
 
-      {/* Property Details Modal Drawer */}
+      {/* FILTER MODAL POPUP */}
+      {showFilterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-surface border border-primary/20 shadow-2xl p-6 md:p-8">
+            <div className="flex items-center justify-between mb-6 border-b border-primary/10 pb-4">
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-secondary" />
+                <h3 className="font-headline-md text-headline-md text-primary">Filter Properties</h3>
+              </div>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="p-2 text-primary/60 hover:text-primary hover:bg-primary/5 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Search Query */}
+              <div>
+                <label className="block text-xs font-label-sm uppercase tracking-widest text-primary mb-2">
+                  Keyword / Location Search
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by title, location, or city..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-background border border-primary/15 px-4 py-3 pl-10 text-body-md font-body-md focus:outline-none focus:border-secondary"
+                  />
+                  <Search className="absolute left-3 top-3.5 w-4 h-4 text-primary/40" />
+                </div>
+              </div>
+
+              {/* Property Type Dropdown */}
+              <div>
+                <label className="block text-xs font-label-sm uppercase tracking-widest text-primary mb-2">
+                  Property Type
+                </label>
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full bg-background border border-primary/15 px-4 py-3 text-body-md font-body-md text-primary focus:outline-none focus:border-secondary cursor-pointer"
+                >
+                  <option value="all">All Types</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Penthouse">Penthouse</option>
+                  <option value="Commercial">Commercial</option>
+                </select>
+              </div>
+
+              {/* Bedrooms Filter */}
+              <div>
+                <label className="block text-xs font-label-sm uppercase tracking-widest text-primary mb-2">
+                  Bedrooms
+                </label>
+                <select
+                  value={selectedBedrooms}
+                  onChange={(e) => setSelectedBedrooms(e.target.value)}
+                  className="w-full bg-background border border-primary/15 px-4 py-3 text-body-md font-body-md text-primary focus:outline-none focus:border-secondary cursor-pointer"
+                >
+                  <option value="all">Any Bedrooms</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4 Bedrooms</option>
+                  <option value="4+">4+ Bedrooms</option>
+                </select>
+              </div>
+
+              {/* Status Filter */}
+              <div>
+                <label className="block text-xs font-label-sm uppercase tracking-widest text-primary mb-2">
+                  Availability Status
+                </label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full bg-background border border-primary/15 px-4 py-3 text-body-md font-body-md text-primary focus:outline-none focus:border-secondary cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="available">Available</option>
+                  <option value="reserved">Reserved</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex gap-4 pt-6 mt-8 border-t border-primary/10">
+              <button
+                onClick={() => {
+                  setSelectedType("all");
+                  setSelectedBedrooms("all");
+                  setSelectedStatus("all");
+                  setSearchQuery("");
+                }}
+                className="flex-1 py-3 border border-primary/20 text-primary font-label-sm text-xs uppercase tracking-widest hover:bg-primary/5 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setShowFilterModal(false)}
+                className="flex-1 py-3 bg-primary text-on-primary font-label-sm text-xs uppercase tracking-widest hover:bg-secondary transition-colors"
+              >
+                Apply Filters ({filteredProperties.length} Results)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PROPERTY DETAILS MODAL DRAWER */}
       {activeProperty && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/70 backdrop-blur-md p-4 md:p-8 animate-in fade-in duration-300">
           <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-surface border border-primary/20 shadow-2xl flex flex-col md:flex-row">

@@ -1,7 +1,17 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/auth/verify/route": "app/api/auth/verify/route.js",
+  "/api/chat/route": "app/api/chat/route.js",
+  "/api/properties/route": "app/api/properties/route.js",
   "/api/inquiries/route": "app/api/inquiries/route.js",
-  "/page": "app/page.js",
+  "/about/page": "app/about/page.js",
   "/account/page": "app/account/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/page": "app/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/services/page": "app/services/page.js",
+  "/admin/properties/page": "app/admin/properties/page.js",
+  "/properties/page": "app/properties/page.js",
+  "/projects/page": "app/projects/page.js",
+  "/philosophy/page": "app/philosophy/page.js",
+  "/process/page": "app/process/page.js"
 }
