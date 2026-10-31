@@ -1,6 +1,0 @@
-{
-  "/api/properties/route": "app/api/properties/route.js",
-  "/page": "app/page.js",
-  "/services/page": "app/services/page.js",
-  "/properties/page": "app/properties/page.js"
-}
