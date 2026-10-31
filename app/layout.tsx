@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles.css";
-import { ChatWidget } from "@/components/chat/ChatWidget";  // ← ADD THIS
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 export const metadata: Metadata = {
   title: "Ace New Interior — Architectural Interior Design Studio",
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
-        <ChatWidget />  {/* ← ADD THIS */}
+        <ChatWidget />
       </body>
     </html>
   );

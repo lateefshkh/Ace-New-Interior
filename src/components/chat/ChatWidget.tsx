@@ -68,7 +68,7 @@ export function ChatWidget() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Hi there! I'm Ace, your property assistant. Are you looking to buy, rent, or just exploring options?",
+      content: "Hi! I'm Ace from Ace New Interior. Are you looking for interior design help, a property, or both?",
       timestamp: new Date(),
     },
   ]);

@@ -1,50 +1,42 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const API_KEY = process.env.GEMINI_API_KEY || '';
-
 const genAI = new GoogleGenerativeAI(API_KEY);
-
-const MODEL_NAME = 'gemini-3.5-flash-lite';
+const MODEL_NAME = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
 const SYSTEM_PROMPT = `
-You are Ace, a friendly real estate agent having a natural conversation with a potential client.
+You are Ace, a consultant at Ace New Interior — an architectural interior design studio serving Mangalore, Udupi, Bangalore, and Goa.
+
+You help clients with:
+- Interior design consultations (residential and commercial)
+- Property search (buy or rent) in the regions above
+- Turnkey design for properties they are purchasing
 
 **Conversation Rules:**
-1. Be warm and natural, like talking to a friend
-2. NEVER repeat the same question or the same message you already sent
+1. Be warm and professional, not salesy
+2. NEVER repeat the same question or message you already sent
 3. Keep responses to 1-2 sentences
 4. Ask ONE question at a time
-5. Build on what they've told you — acknowledge their last answer specifically before moving on
+5. Build on what they've told you — acknowledge their last answer before moving on
 6. If a field is already marked ✅ below, do NOT ask about it again
 
-**Your Goal:**
-Have a natural conversation to understand what they're looking for.
-
 **What you need to learn (in this order):**
-1. Are they buying, renting, or exploring?
-2. What type of property? (2BHK, 3BHK, Villa, etc.)
-3. What location/area?
-4. What budget?
+1. Are they looking for interior design, a property, or both?
+2. If property: buy, rent, or exploring?
+3. Property type (2BHK, 3BHK, Villa, etc.) and preferred area
+4. Budget range (in lakhs or crore)
 5. Their name and phone number
 
-**IMPORTANT: If they resist giving info, back off and be helpful.**
+**If they resist giving info, back off and offer general help about design or the local market.**
 `;
 
 export async function getAIResponse(
   userMessage: string,
   conversationHistory: Array<{ role: string; content: string }>
 ): Promise<string> {
-  console.log('🤖 Generating AI response...');
-  console.log('📝 User message:', userMessage);
-  console.log('📚 History length:', conversationHistory.length);
-
   const userMsg = userMessage.toLowerCase().trim();
-
-  // Use the same extraction logic everywhere so "what do we know" is consistent
   const known = extractInquiryData(conversationHistory);
-  const hasIntent = !!known.intent && known.intent !== 'browse' ? true : /buy|rent|sell|exploring|browsing|looking/i.test(
-    conversationHistory.map(m => m.content).join(' ')
-  );
+  const hasIntent = !!known.intent && known.intent !== 'browse';
   const hasPropertyType = !!known.property_type_preference;
   const hasLocation = !!known.location_preference;
   const hasBudget = !!known.budget_min;
@@ -58,30 +50,31 @@ export async function getAIResponse(
     return lastAssistantMsg && norm(candidate) === norm(lastAssistantMsg);
   };
 
-  // --- Quick deterministic replies for simple inputs ---
-
   if (userMsg === 'ok' || userMsg === 'okay' || userMsg === 'sure') {
-    if (!hasIntent) return "Great! Are you looking to buy, rent, or just exploring what's out there?";
-    if (!hasPropertyType) return "What kind of property are you interested in? Apartment, villa, or something else?";
-    if (!hasLocation) return "Which areas are you most interested in?";
-    if (!hasBudget) return "What's your budget range? That'll help me find the best options for you.";
+    if (!hasIntent) return "Great! Are you looking for interior design, a property, or both?";
+    if (!hasPropertyType) return "What kind of space are you thinking — apartment, villa, or a commercial project?";
+    if (!hasLocation) return "Which area works best — Mangalore, Udupi, Bangalore, or Goa?";
+    if (!hasBudget) return "What's your budget range? That helps me suggest the right options.";
   }
 
   if (userMsg === 'why' || userMsg === 'why?') {
-    return "I just want to make sure I find the perfect properties for you! 😊 If you're not comfortable sharing yet, that's totally fine. Just let me know what kind of properties you're curious about.";
+    return "I want to match you with the right design approach or properties. If you'd rather browse first, tell me what caught your eye on the site.";
   }
   if (userMsg === 'no' || userMsg === 'not now') {
-    return "No problem at all! 🏠 Take your time exploring. Feel free to ask me anything about properties, neighborhoods, or the market. What would you like to know?";
+    return "No problem. Feel free to ask about our design process, past projects, or property listings whenever you're ready.";
   }
 
   if (userMsg === 'hi' || userMsg === 'hello' || userMsg === 'hey' || userMsg === '') {
-    return "Hi there! 👋 I'm Ace, your local real estate expert. What brings you here today? Looking to buy, rent, or just exploring?";
+    return "Hi! I'm Ace from Ace New Interior. Are you looking for interior design help, a property, or both?";
   }
 
-  // --- Try Gemini for natural, context-aware responses ---
-  try {
-    console.log('🚀 Calling Gemini API...');
+  if (!API_KEY) {
+    if (!hasIntent) return "Hi! Are you interested in interior design, property search, or both?";
+    if (!hasPhone) return "What's the best number to reach you? Our team will follow up shortly.";
+    return "Thanks — our team will be in touch soon. Anything else you'd like to know about our work?";
+  }
 
+  try {
     const model = genAI.getGenerativeModel({
       model: MODEL_NAME,
       generationConfig: {
@@ -91,7 +84,6 @@ export async function getAIResponse(
     });
 
     let prompt = SYSTEM_PROMPT + '\n\n';
-
     prompt += `**What we already know (do NOT ask about these again):**\n`;
     prompt += `- Intent: ${hasIntent ? '✅ ' + known.intent : '❌'}\n`;
     prompt += `- Property Type: ${hasPropertyType ? '✅ ' + known.property_type_preference : '❌'}\n`;
@@ -107,7 +99,7 @@ export async function getAIResponse(
 
     prompt += `\n**Client just said:** "${userMessage}"\n\n`;
     prompt += `**Your last message was:** "${lastAssistantMsg}"\n`;
-    prompt += `Do not repeat your last message. Acknowledge what the client just said, then ask about the next ❌ item above (or if all are ✅, ask about specific features/preferences).\n\n`;
+    prompt += `Do not repeat your last message. Acknowledge what the client just said, then ask about the next ❌ item above.\n\n`;
     prompt += `**Your response (warm, natural, ONE question max):**\n`;
 
     const result = await model.generateContent(prompt);
@@ -120,44 +112,46 @@ export async function getAIResponse(
       .trim();
 
     if (cleanResponse && !isRepeat(cleanResponse)) {
-      console.log('✅ AI responded:', cleanResponse);
       return cleanResponse;
     }
 
-    console.log('⚠️ Gemini repeated itself, falling back to deterministic reply');
     throw new Error('Repeat detected');
-
-  } catch (error: any) {
-    console.error('❌ Gemini API Error or repeat:', error.message);
-
-    // --- Deterministic fallback based on what we know ---
-    if (!hasIntent) return "Hi! 👋 Are you looking to buy, rent, or just exploring the market?";
-    if (!hasPropertyType) return "What kind of property are you thinking about - apartment, villa, or something else?";
-    if (!hasLocation) return "Which areas are you most interested in? I know some great properties!";
-    if (!hasBudget) return "What's your budget range? That'll help me find the perfect options!";
-    if (!hasName) return "By the way, what's your name? I'd love to personalize these suggestions!";
-    if (!hasPhone) return "What's the best number to reach you on? I'd like to share some exclusive details!";
-    return "Perfect, I have everything I need! Our agent will reach out shortly with matching options. Anything specific you'd like — balconies, floor preference, amenities?";
+  } catch {
+    if (!hasIntent) return "Are you looking for interior design, a property, or both?";
+    if (!hasPropertyType) return "What kind of space — apartment, villa, or commercial?";
+    if (!hasLocation) return "Which area — Mangalore, Udupi, Bangalore, or Goa?";
+    if (!hasBudget) return "What's your budget range in lakhs or crore?";
+    if (!hasName) return "What's your name?";
+    if (!hasPhone) return "What's the best number to reach you on?";
+    return "Perfect — our team will follow up with matching options. Any specific preferences on layout or style?";
   }
 }
 
-export function extractInquiryData(messages: Array<{ role: string; content: string }>) {
-  const inquiry: any = {};
+export interface InquiryData {
+  name?: string;
+  phone?: string;
+  email?: string;
+  intent?: string;
+  location_preference?: string;
+  property_type_preference?: string;
+  budget_min?: number;
+  budget_max?: number;
+}
+
+export function extractInquiryData(messages: Array<{ role: string; content: string }>): InquiryData {
+  const inquiry: InquiryData = {};
   const fullText = messages.map(m => m.content).join(' ');
   const lowerText = fullText.toLowerCase();
 
-  // --- Phone: strip all non-digits, find a 10-13 digit run, keep last 10 ---
   const digitsOnly = fullText.replace(/\D/g, '');
   const phoneRun = digitsOnly.match(/\d{10,13}/);
   if (phoneRun) {
     inquiry.phone = phoneRun[0].slice(-10);
   }
 
-  // --- Email ---
   const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   if (emailMatch) inquiry.email = emailMatch[0];
 
-  // --- Context-aware slot filling: look at what was asked right before each user reply ---
   for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
     if (m.role !== 'user') continue;
@@ -187,13 +181,12 @@ export function extractInquiryData(messages: Array<{ role: string; content: stri
     }
   }
 
-  // --- Intent ---
-  if (/\bbuy\b|\bpurchase\b/.test(lowerText)) inquiry.intent = 'buy';
+  if (/\binterior\b|\bdesign\b|\brenovat/.test(lowerText)) inquiry.intent = 'design';
+  else if (/\bbuy\b|\bpurchase\b/.test(lowerText)) inquiry.intent = 'buy';
   else if (/\brent\b|\brental\b/.test(lowerText)) inquiry.intent = 'rent';
   else if (/\bsell\b/.test(lowerText)) inquiry.intent = 'sell';
   else inquiry.intent = 'browse';
 
-  // --- Budget: handles "2crore", "2 crore", "50 lakhs", "1.5cr" ---
   const budgetMatch = lowerText.match(/(\d+(?:\.\d+)?)\s*(lakhs?|lac|crores?|cr)\b/i);
   if (budgetMatch) {
     const amount = parseFloat(budgetMatch[1]);
@@ -207,7 +200,6 @@ export function extractInquiryData(messages: Array<{ role: string; content: stri
     }
   }
 
-  // --- Property type ---
   if (/2\s*bhk/.test(lowerText)) inquiry.property_type_preference = '2BHK';
   else if (/3\s*bhk/.test(lowerText)) inquiry.property_type_preference = '3BHK';
   else if (/villa/.test(lowerText)) inquiry.property_type_preference = 'Villa';
@@ -217,7 +209,6 @@ export function extractInquiryData(messages: Array<{ role: string; content: stri
   return inquiry;
 }
 
-export function isInquiryQualified(inquiry: any): boolean {
-  // Phone is the hard requirement — everything else is a bonus for lead quality
+export function isInquiryQualified(inquiry: InquiryData): boolean {
   return !!inquiry.phone;
 }

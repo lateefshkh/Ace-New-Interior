@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Plus, Pencil, Trash2, X, Upload } from 'lucide-react';
+import { useDashboardAuth } from '@/hooks/use-dashboard-auth';
 
 interface Property {
   $id: string;
@@ -23,6 +25,8 @@ interface Property {
 }
 
 export default function AdminPropertiesPage() {
+  const router = useRouter();
+  const { authenticated, authHeaders } = useDashboardAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -47,8 +51,12 @@ export default function AdminPropertiesPage() {
   const [imagePreview, setImagePreview] = useState('');
 
   useEffect(() => {
+    if (!authenticated) {
+      router.replace('/account');
+      return;
+    }
     fetchProperties();
-  }, []);
+  }, [authenticated, router]);
 
   const fetchProperties = async () => {
     try {
@@ -87,6 +95,7 @@ export default function AdminPropertiesPage() {
 
       const response = await fetch(url, {
         method,
+        headers: authHeaders(),
         body: formDataToSend,
       });
 
@@ -112,6 +121,7 @@ export default function AdminPropertiesPage() {
     try {
       const response = await fetch(`/api/properties?id=${id}`, {
         method: 'DELETE',
+        headers: authHeaders(),
       });
       const data = await response.json();
       if (data.success) {

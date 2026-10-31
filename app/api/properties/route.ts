@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { databases, ID, storage } from '@/lib/appwrite/client';
+import { isDashboardAuthorized, unauthorizedResponse } from '@/lib/auth/dashboard';
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 const PROPERTIES_COLLECTION = process.env.NEXT_PUBLIC_APPWRITE_PROPERTIES_COLLECTION!;
@@ -77,6 +78,10 @@ async function parsePropertyFormData(request: NextRequest) {
 
 // POST: Create a new property
 export async function POST(request: NextRequest) {
+  if (!isDashboardAuthorized(request)) {
+    return unauthorizedResponse();
+  }
+
   try {
     const contentType = request.headers.get('content-type') || '';
     let propertyData: any = {};
@@ -140,6 +145,10 @@ export async function POST(request: NextRequest) {
 // PUT: Update a property — accepts FormData (multipart) since the admin form
 // always submits FormData for both add and edit, or JSON as a fallback
 export async function PUT(request: NextRequest) {
+  if (!isDashboardAuthorized(request)) {
+    return unauthorizedResponse();
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const idFromQuery = searchParams.get('id');
@@ -193,6 +202,10 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: Delete a property
 export async function DELETE(request: NextRequest) {
+  if (!isDashboardAuthorized(request)) {
+    return unauthorizedResponse();
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

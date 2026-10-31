@@ -14,22 +14,16 @@ export function SiteFooter() {
             Ace New Interior
           </Link>
           <p className="mt-8 font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant md:mt-0">
-            © 2024 Ace New Interior. All Rights Reserved.
+            © 2026 Ace New Interior. All Rights Reserved.
           </p>
         </div>
 
         <nav className="flex flex-wrap gap-6 md:flex-col md:items-end md:gap-4">
           <Link
-            href="/properties"
+            href="/projects"
             className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
           >
-            Properties
-          </Link>
-          <Link
-            href="/philosophy"
-            className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
-          >
-            Philosophy
+            Projects
           </Link>
           <Link
             href="/services"
@@ -38,10 +32,22 @@ export function SiteFooter() {
             Services
           </Link>
           <Link
+            href="/properties"
+            className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
+          >
+            Properties
+          </Link>
+          <Link
             href="/about"
             className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
           >
             About
+          </Link>
+          <Link
+            href="/account"
+            className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-on-surface-variant transition-all duration-300 ease-out hover:text-primary hover:opacity-70"
+          >
+            Account
           </Link>
           <Link
             href="/#inquiry"

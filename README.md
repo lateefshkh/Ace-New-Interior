@@ -1,22 +1,56 @@
-# Screen Weaver
+# Ace New Interior
 
-Build this app using the HTML files referenced below. You can hotlink the images referenced in the HTML. The attached images are screenshots of the desired screens. Here are public links to the html of the screens which you should read and use to build the app:
+Website for **Ace New Interior** — an architectural interior design studio serving Mangalore, Udupi, Bangalore, and Goa. Includes property listings, an AI chat assistant for lead capture, and an admin portal for managing inquiries and inventory.
 
-1. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkYzk2MTk4MzQwNzc5YjA3ZGI3MWZjMmExEgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-2. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkY2YyNThhMmQwMWE2MmZiOTBmMzY2Y2U4EgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-3. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkZDMwYTg3YTYwMzM4NGU2Y2I2MTE2YTA4EgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-4. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkZDMxNTZhYTEwMWVlNjg2YzcyMGNlYjIxEgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-5. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkY2ZhZDZhMDIwMWE2MDNlOGQ2MzliMGE5EgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-6. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkY2VjZGNhODYwMDMwMzU5OTUyMzc4YjU4EgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
-7. https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzAwMDY1OGFkZDJlNDRmY2UwMDMwM2U5OGVlMTBhMTk5EgsSBxD9zbO8pQ0YAZIBJAoKcHJvamVjdF9pZBIWQhQxNjE2MjU1OTc1NjcwNDM2NzY2NQ&filename=&opi=89354086
+## Features
 
-## Development
+- Marketing site (home, about, philosophy, services, process, projects)
+- Property listings with search and filters
+- AI chat widget (Google Gemini) for design and property inquiries
+- Admin portal for inquiries dashboard and property management
+- Appwrite backend for data and file storage
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Setup
+
+1. Copy environment variables:
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
+cp .env.example .env.local
+```
+
+2. Fill in Appwrite, Gemini, and dashboard credentials in `.env.local`.
+
+3. Bootstrap Appwrite collections and storage:
+
+```sh
+npm run setup:appwrite
+```
+
+4. Start the dev server:
+
+```sh
 npm i
 npm run dev
 ```
+
+## Environment Variables
+
+See `.env.example` for the full list. Required:
+
+- `NEXT_PUBLIC_APPWRITE_*` — Appwrite project and collection IDs
+- `APPWRITE_API_KEY` — Server-side Appwrite API key
+- `GEMINI_API_KEY` — Google Gemini API key (optional; chat falls back to rule-based replies)
+- `DASHBOARD_PASSWORD` — Password for `/account`, `/dashboard`, and property admin writes
+
+## Admin Access
+
+1. Go to `/account` and sign in with `DASHBOARD_PASSWORD`
+2. Open the **Client Inquiries Dashboard** or **Property Admin Manager**
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run setup:appwrite` | Create Appwrite database, collections, and storage |

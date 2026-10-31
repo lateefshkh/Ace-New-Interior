@@ -3,17 +3,10 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { useParallax, useScrollReveal } from "@/hooks/use-motion";
+import { IMAGES } from "@/lib/constants/images";
 
-// ============================================================================
-// PASTE YOUR OWN IMAGE URLS HERE
-// You can use local paths (e.g. "/images/hero.jpg") or web links ("https://...")
-// ============================================================================
-const HERO_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.1347174.Woblo.png";
-
-const MATERIAL_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.2-6-19-Yvonne-Jacobs-01-1600x965-1.Woblo.jpg";
-// ============================================================================
+const HERO_IMG = IMAGES.hero;
+const MATERIAL_IMG = IMAGES.detail;
 
 const chapters = [
   {

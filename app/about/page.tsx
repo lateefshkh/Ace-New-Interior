@@ -4,17 +4,10 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { useParallax, useScrollReveal } from "@/hooks/use-motion";
+import { IMAGES } from "@/lib/constants/images";
 
-// ============================================================================
-// PASTE YOUR OWN IMAGE URLS HERE
-// You can use local paths (e.g. "/images/hero.jpg") or web links ("https://...")
-// ============================================================================
-const ABOUT_HERO_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.1347177.Woblo.png";
-
-const ARCHITECT_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.PHOTO-2020-01-19-18-32-40-2.Woblo.jpg";
-// ============================================================================
+const ABOUT_HERO_IMG = IMAGES.heroAlt;
+const ARCHITECT_IMG = IMAGES.studio;
 
 const values = [
   {
@@ -38,9 +31,9 @@ const values = [
 ];
 
 const press = [
-  { outlet: "Architectural Digest", title: "The New Wave of Quiet Luxury Interiors" },
-  { outlet: "Wallpaper* Magazine", title: "Minimalist Residences Redefining Spatial Silence" },
-  { outlet: "Elle Decor", title: "Monolithic Geometry & Material Integrity in Modern Homes" },
+  { outlet: "Inside Outside", title: "Coastal Minimalism in Karnataka" },
+  { outlet: "Better Interiors", title: "Material Honesty in Modern Indian Homes" },
+  { outlet: "Design Today", title: "Ace New Interior on Restraint and Light" },
 ];
 
 export default function AboutPage() {
@@ -51,18 +44,17 @@ export default function AboutPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <SiteNav />
 
-      <header className="relative flex h-[70vh] items-center justify-center overflow-hidden">
+      <header className="relative flex min-h-[60vh] items-center justify-center overflow-hidden py-16">
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src={ABOUT_HERO_IMG}
             alt="Ace New Interior studio workspace"
             data-parallax="25"
-            className="absolute -top-[25%] left-0 h-[150%] w-full object-cover scale-105"
+            className="absolute -top-[20%] left-0 h-[140%] w-full object-cover scale-105"
           />
-          <div className="absolute inset-0 bg-background/30 mix-blend-overlay" />
         </div>
 
-        <div className="relative z-10 mx-auto mt-20 max-w-container-max px-margin-mobile text-center md:px-margin-desktop">
+        <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile text-center md:px-margin-desktop">
           <div className="inline-block border-architectural bg-surface/85 px-8 py-12 backdrop-blur-md md:px-14 md:py-16">
             <span className="mb-3 block font-label-sm text-label-sm uppercase tracking-widest text-secondary">
               The Studio
@@ -94,9 +86,9 @@ export default function AboutPage() {
                 experience, Ace New Interior designs spaces stripped of artificial ornamentation.
               </p>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Our team collaborates with master artisans, structural engineers, and landscape
-                architects across Kyoto, London, and New York to deliver commissions that age with
-                timeless distinction.
+                Our team works with local artisans, structural engineers, and landscape
+                specialists across Mangalore, Udupi, Bangalore, and Goa to deliver commissions
+                that age with timeless distinction.
               </p>
             </div>
 

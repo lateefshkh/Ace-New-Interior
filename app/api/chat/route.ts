@@ -5,17 +5,11 @@ import { findMatchingProperties, MatchedProperty } from '@/lib/appwrite/properti
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 const INQUIRIES_COLLECTION = process.env.NEXT_PUBLIC_APPWRITE_INQUIRIES_COLLECTION!;
-const CONVERSATIONS_COLLECTION = process.env.NEXT_PUBLIC_APPWRITE_CONVERSATIONS_COLLECTION!;
-
 
 export async function POST(request: NextRequest) {
   try {
     const { message, sessionId, leadId, sourcePage, shownPropertyIds, history: clientHistory } = await request.json();
     const lastShownPropertyIds: string[] = Array.isArray(shownPropertyIds) ? shownPropertyIds : [];
-
-    console.log('📨 Received message:', message);
-    console.log('📋 Session ID:', sessionId);
-    console.log('📋 Lead ID:', leadId);
 
     if (!message) {
       return NextResponse.json({ error: 'Message required' }, { status: 400 });
@@ -24,24 +18,13 @@ export async function POST(request: NextRequest) {
     const currentSessionId = sessionId || ID.unique();
     let currentLeadId = leadId;
 
-    // Conversation history now comes from the client (no messages are persisted to the DB —
-    // only the extracted lead info gets saved once the customer actually provides it)
     let history: Array<{ role: string; content: string }> = Array.isArray(clientHistory)
       ? clientHistory.filter((m: any) => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
       : [];
 
-    console.log('📚 History length (from client):', history.length);
-
     history.push({ role: 'user', content: message });
 
-    // Get AI response
-    console.log('🧠 Calling AI...');
     const aiResponse = await getAIResponse(message, history);
-    console.log('🤖 AI Response:', aiResponse);
-
-    // Save AI response
-    // (not persisted to DB — kept only in-memory for this request/response cycle)
-
     history.push({ role: 'assistant', content: aiResponse });
 
     // Extract inquiry data
@@ -71,7 +54,6 @@ export async function POST(request: NextRequest) {
         budgetMaxLakhs: extractedInquiry.budget_max,
         excludeIds: askedForMore ? lastShownPropertyIds : [],
       });
-      console.log('🏠 Matched properties:', matchedProperties.length);
     }
 
     if (extractedInquiry.phone && isInquiryQualified(extractedInquiry)) {
@@ -114,7 +96,6 @@ export async function POST(request: NextRequest) {
           }
         );
         currentLeadId = inquiry.$id!;
-        console.log('🔔 New lead qualified!');
       }
     }
 

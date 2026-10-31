@@ -4,14 +4,9 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { useParallax, useScrollReveal } from "@/hooks/use-motion";
+import { IMAGES } from "@/lib/constants/images";
 
-// ============================================================================
-// PASTE YOUR OWN IMAGE URLS HERE
-// You can use local paths (e.g. "/images/hero.jpg") or web links ("https://...")
-// ============================================================================
-const SERVICES_HERO_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.modern-living-room-interior-design-scaled.Woblo.jpg";
-// ============================================================================
+const SERVICES_HERO_IMG = IMAGES.livingRoom;
 
 const servicesList = [
   {
@@ -29,7 +24,7 @@ const servicesList = [
     number: "02",
     title: "Custom Furniture & Object Curation",
     description:
-      "Designing bespoke furniture pieces, sculptural joinery, and sourcing rare vintage design objects from European and Japanese art dealers.",
+      "Designing bespoke furniture pieces, sculptural joinery, and sourcing materials from trusted local and regional craftspeople.",
     deliverables: [
       "Custom Furniture Prototypes",
       "Art & Vintage Procurement",
@@ -68,18 +63,17 @@ export default function ServicesPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <SiteNav />
 
-      <header className="relative flex h-[70vh] items-center justify-center overflow-hidden">
+      <header className="relative flex min-h-[60vh] items-center justify-center overflow-hidden py-16">
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src={SERVICES_HERO_IMG}
             alt="Ace New Interior architectural detail"
             data-parallax="25"
-            className="absolute -top-[25%] left-0 h-[150%] w-full object-cover scale-105"
+            className="absolute -top-[20%] left-0 h-[140%] w-full object-cover scale-105"
           />
-          <div className="absolute inset-0 bg-background/30 mix-blend-overlay" />
         </div>
 
-        <div className="relative z-10 mx-auto mt-20 max-w-container-max px-margin-mobile text-center md:px-margin-desktop">
+        <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile text-center md:px-margin-desktop">
           <div className="inline-block border-architectural bg-surface/85 px-8 py-12 backdrop-blur-md md:px-14 md:py-16">
             <span className="mb-3 block font-label-sm text-label-sm uppercase tracking-widest text-secondary">
               Scope of Practice

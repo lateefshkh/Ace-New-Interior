@@ -5,11 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
-  { href: "/properties", label: "Properties" },
-  { href: "/philosophy", label: "Philosophy" },
+  { href: "/projects", label: "Projects" },
   { href: "/services", label: "Services" },
+  { href: "/properties", label: "Properties" },
   { href: "/about", label: "About" },
-  { href: "/process", label: "Process" },
   { href: "/account", label: "Account" },
 ] as const;
 
@@ -18,7 +17,7 @@ export function SiteNav() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-primary/10 bg-surface/80 backdrop-blur-xl transition-all duration-500 ease-in-out">
+    <header className="sticky top-0 z-50 w-full border-b border-primary/15 bg-[#fbf9f6] opacity-100 shadow-md transition-all duration-300">
       <div className="mx-auto flex w-full max-w-container-max items-center justify-between px-margin-mobile py-6 md:px-margin-desktop">
         <Link
           href="/"
@@ -63,7 +62,7 @@ export function SiteNav() {
       </div>
 
       {open ? (
-        <nav className="flex flex-col gap-6 border-t border-primary/10 bg-surface px-margin-mobile py-8 md:hidden">
+        <nav className="absolute top-full left-0 w-full flex flex-col gap-6 border-b border-t border-primary/15 bg-[#fbf9f6] px-margin-mobile py-8 shadow-2xl z-50 md:hidden">
           {links.map((link) => {
             const isActive = pathname === link.href;
             return (

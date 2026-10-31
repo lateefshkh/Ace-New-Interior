@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/appwrite/server';
+import { isDashboardAuthorized, unauthorizedResponse } from '@/lib/auth/dashboard';
 
 const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 const INQUIRIES_COLLECTION = process.env.NEXT_PUBLIC_APPWRITE_INQUIRIES_COLLECTION!;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!isDashboardAuthorized(request)) {
+    return unauthorizedResponse();
+  }
+
   try {
-    console.log('📊 Fetching inquiries...');
-    
-    // Use server client with API key
     const { databases } = createServerClient();
     
     // Get all documents (no queries)
@@ -16,8 +18,6 @@ export async function GET() {
       DATABASE_ID,
       INQUIRIES_COLLECTION
     );
-    
-    console.log('✅ Found:', response.documents.length, 'documents');
     
     return NextResponse.json({
       success: true,
@@ -65,8 +65,6 @@ export async function POST(request: NextRequest) {
         source_page: 'inquiry_form',
       }
     );
-
-    console.log('✅ Inquiry created:', inquiry.$id);
 
     return NextResponse.json({
       success: true,

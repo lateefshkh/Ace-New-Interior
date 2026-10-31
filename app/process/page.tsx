@@ -3,15 +3,12 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { useParallax, useScrollReveal } from "@/hooks/use-motion";
+import { IMAGES } from "@/lib/constants/images";
 
-const SKETCH_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.PHOTO-2020-01-19-18-32-40-2.Woblo.jpg";
-const MOODBOARD_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.2-6-19-Yvonne-Jacobs-01-1600x965-1.Woblo.jpg";
-const RENDER_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.modern-living-room-interior-design-scaled.Woblo.jpg";
-const FINAL_IMG =
-  "/home-ace-interior-architect-mangalore-udupi-bangalore-goa.image.1347174.Woblo.png";
+const SKETCH_IMG = IMAGES.studio;
+const MOODBOARD_IMG = IMAGES.detail;
+const RENDER_IMG = IMAGES.livingRoom;
+const FINAL_IMG = IMAGES.hero;
 
 const steps = [
   {
